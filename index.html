@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contract-Query Demo — open-source contract search</title>
+<meta name="description" content="A $0 open-source demo: query a sample contract corpus by keyword, document type, and clause type, with evidence snippets.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+<nav>
+<a class="brand" href="index.html">Contract-Query Demo</a>
+<ul>
+<li><a href="index.html" aria-current="page">Demo</a></li>
+<li><a href="about.html">How it works</a></li>
+</ul>
+</nav>
+</header>
+<main>
+<h1>Contract-Query Demo</h1>
+<p class="lede">Search six sample contracts by keyword, document type, or clause
+type. Every hit shows its evidence — the exact sentence it came from.</p>
+
+<section class="panel">
+<label for="q">Keyword</label>
+<input id="q" type="search" placeholder="e.g. payment, termination, $20,000…" autocomplete="off">
+<div class="row">
+<div>
+<label for="type">Document type</label>
+<select id="type">
+<option value="all">All types</option>
+<option value="NDA">NDA</option>
+<option value="MSA">MSA</option>
+<option value="SOW">SOW</option>
+<option value="Contractor">Contractor</option>
+<option value="Grant">Grant</option>
+<option value="Vendor">Vendor</option>
+</select>
+</div>
+<div>
+<label>Clause</label>
+<div class="clauses" role="group" aria-label="Clause type">
+<button data-clause="" class="on">Any</button>
+<button data-clause="payment">Payment terms</button>
+<button data-clause="obligation">Obligations</button>
+<button data-clause="termination">Termination</button>
+<button data-clause="confidentiality">Confidentiality</button>
+</div>
+</div>
+</div>
+<button id="run" class="primary">Run query</button>
+</section>
+
+<section>
+<h2 id="resultHead">Results</h2>
+<p id="summary" class="muted">Run a query to see results.</p>
+<ul id="results" class="results"></ul>
+</section>
+
+<section class="note">
+<p><strong>Demo data.</strong> All six documents are synthetic samples written
+for this demo — not real agreements. <a href="about.html">How it works →</a></p>
+</section>
+</main>
+<footer>
+<p>Contract-Query Demo · $0 open-source static demo · no tracking, no backend.</p>
+<p class="fineprint">Demo only — not legal advice. Query semantics ported from an open research prototype.</p>
+</footer>
+<script src="corpus.js"></script>
+<script src="query.js"></script>
+<script>
+const q = document.getElementById("q");
+const typeSel = document.getElementById("type");
+const clauseBtns = [...document.querySelectorAll(".clauses button")];
+const resultsEl = document.getElementById("results");
+const summaryEl = document.getElementById("summary");
+let clause = "";
+
+clauseBtns.forEach(b => b.addEventListener("click", () => {
+  clauseBtns.forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  clause = b.dataset.clause;
+  run();
+}));
+document.getElementById("run").addEventListener("click", run);
+q.addEventListener("input", run);
+typeSel.addEventListener("change", run);
+
+function esc(s) {
+  return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+function run() {
+  const results = runQuery({ text: q.value, type: typeSel.value, clause: clause || undefined });
+  const counts = countByType(results);
+  summaryEl.textContent = results.length
+    ? `${results.length} hit${results.length === 1 ? "" : "s"} — ` +
+      Object.entries(counts).map(([t, n]) => `${n} in ${t}`).join(", ")
+    : "No hits. Try a keyword (e.g. “payment”), a clause type, or clear the filters.";
+  resultsEl.innerHTML = results.map(r => `
+    <li>
+      <div class="rhead"><strong>${esc(r.title)}</strong>
+        <span class="tag">${esc(r.type)}</span>
+        <span class="tag clause">${esc(r.clause)}</span></div>
+      <p class="snippet">“${esc(r.snippet)}”</p>
+    </li>`).join("");
+}
+</script>
+</body>
+</html>

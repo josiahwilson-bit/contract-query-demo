@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works — Contract-Query Demo</title>
+<meta name="description" content="How the contract-query demo works: query semantics, clause detectors, and the synthetic sample corpus.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+<nav>
+<a class="brand" href="index.html">Contract-Query Demo</a>
+<ul>
+<li><a href="index.html">Demo</a></li>
+<li><a href="about.html" aria-current="page">How it works</a></li>
+</ul>
+</nav>
+</header>
+<main>
+<h1>How it works</h1>
+
+<section>
+<h2>The idea</h2>
+<p>Contract review starts with finding the right sentences: what must be paid,
+who must do what, how things end, what stays secret. This demo runs those
+questions over a small corpus and shows the evidence for every hit — the
+exact sentence, in the exact document.</p>
+</section>
+
+<section>
+<h2>Query semantics</h2>
+<ul>
+<li><strong>Keyword</strong> — case-insensitive substring match over sentences
+  (the <em>name_contains</em> idea: say what you're looking for, plainly).</li>
+<li><strong>Document type</strong> — NDA, MSA, SOW, Contractor, Grant, Vendor.</li>
+<li><strong>Clause detectors</strong> — deterministic patterns, no ML, no
+  black box:
+  <ul>
+  <li>Payment terms: dollar amounts, payment, invoice, payable, fee</li>
+  <li>Obligations: shall, must, agrees to, is required to</li>
+  <li>Termination: terminat*</li>
+  <li>Confidentiality: confidential, non-disclosure, NDA</li>
+  </ul></li>
+<li><strong>Empty query matches nothing</strong> — by design. A query with no
+  filters is not a finding.</li>
+</ul>
+</section>
+
+<section>
+<h2>Discipline</h2>
+<p>The engine behind this demo was built with a simple rule: a keyword hit is
+a lead, not a qualification. Every result carries its evidence so a human can
+review it. Nothing here decides anything on its own.</p>
+</section>
+
+<section>
+<h2>The corpus</h2>
+<p>Six short <strong>synthetic</strong> sample contracts, written for this demo:
+NDA, Master Services Agreement, Statement of Work, Independent Contractor
+Agreement, Grant Agreement, Vendor Agreement. They are fictional. They are not
+templates and not legal advice.</p>
+</section>
+
+<section>
+<h2>Stack</h2>
+<p>Static HTML + CSS + JavaScript. No backend, no tracking, no build step, $0
+to host. The query engine is a JavaScript port of an open research prototype
+(<em>doc_queries.py</em>: explicit filters, evidence-carrying results).</p>
+</section>
+
+<section class="note">
+<h2>Possible next steps</h2>
+<ul>
+<li>Swap the synthetic corpus for real public-domain agreements.</li>
+<li>Add an open-model layer (e.g. legal-BERT) that maps natural language to
+  the fixed, validated filter set — the model never generates queries freely.</li>
+<li>Publish an evaluation: precision/recall of each detector on a labeled set.</li>
+</ul>
+</section>
+</main>
+<footer>
+<p>Contract-Query Demo · $0 open-source static demo · no tracking, no backend.</p>
+<p class="fineprint">Demo only — not legal advice.</p>
+</footer>
+</body>
+</html>
